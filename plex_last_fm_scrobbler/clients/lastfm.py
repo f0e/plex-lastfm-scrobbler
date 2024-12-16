@@ -68,24 +68,8 @@ class LastFMScrobbler:
         except Exception as e:
             logger.exception(e)
 
-    def should_scrobble(self, track: Track) -> bool:
-        if self.to_scrobble_track:
-            return False
-
-        # https://www.last.fm/api/scrobbling#scrobble-requests
-        MIN_TRACK_DURATION_MS = 30 * 1000  # 30 seconds
-        MIN_TRACK_PROGRESS_MS = 4 * 60 * 1000  # 4 minutes
-        MIN_TRACK_PROGRESS_PERCENT = 0.5
-
-        if not track.duration_ms or track.duration_ms < MIN_TRACK_DURATION_MS:
-            return False
-
-        return (
-            self.played_amount / track.duration_ms >= MIN_TRACK_PROGRESS_PERCENT
-            or self.played_amount > MIN_TRACK_PROGRESS_MS
-        )
-
     def update_track(self, track: Track):
+        # update progress
         if (
             self.last_progress_ms is not None
             and track.progress_ms is not None
@@ -102,10 +86,28 @@ class LastFMScrobbler:
             )
         self.last_progress_ms = track.progress_ms
 
+        # update scrobbling
         if not self.to_scrobble_track:
-            self.to_scrobble_track = self.should_scrobble(track)
+            self.to_scrobble_track = self._should_scrobble_track(track)
             if self.to_scrobble_track:
                 logger.info(f"Queued scrobble for {track.artist} - {track.name}")
+
+    def _should_scrobble_track(self, track: Track) -> bool:
+        if self.to_scrobble_track:
+            return False
+
+        # https://www.last.fm/api/scrobbling#scrobble-requests
+        MIN_TRACK_DURATION_MS = 30 * 1000  # 30 seconds
+        MIN_TRACK_PROGRESS_MS = 4 * 60 * 1000  # 4 minutes
+        MIN_TRACK_PROGRESS_PERCENT = 0.5
+
+        if not track.duration_ms or track.duration_ms < MIN_TRACK_DURATION_MS:
+            return False
+
+        return (
+            self.played_amount / track.duration_ms >= MIN_TRACK_PROGRESS_PERCENT
+            or self.played_amount > MIN_TRACK_PROGRESS_MS
+        )
 
     def _scrobble_track(self, track: Track):
         try:
