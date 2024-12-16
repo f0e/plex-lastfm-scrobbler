@@ -20,11 +20,6 @@ class Config:
     LASTFM_USERNAME = os.getenv("LASTFM_USERNAME", "")
     LASTFM_PASSWORD = os.getenv("LASTFM_PASSWORD", "")
 
-    # scrobbling configuration
-    MAIN_UPDATE_GAP_SECS = 1
-    SCROBBLE_THRESHOLD_PERCENT = 0.5
-    MAX_SCROBBLE_TIME_SECS = 4 * 60
-
     @classmethod
     def validate(cls):
         missing_configs = []

@@ -8,6 +8,8 @@ from .sources.plex import PlexTrackFetcher
 
 logger = logging.getLogger(__name__)
 
+MAIN_UPDATE_GAP_SECS = 1
+
 
 def main():
     config = Config()
@@ -39,7 +41,7 @@ def main():
             if track:
                 lastfm.update_track(track)
 
-            time.sleep(Config.MAIN_UPDATE_GAP_SECS)
+            time.sleep(MAIN_UPDATE_GAP_SECS)
         except Exception as e:
             logger.exception(e)
             time.sleep(3)
