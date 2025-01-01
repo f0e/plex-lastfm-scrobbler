@@ -44,7 +44,7 @@ class Config:
 
         # log missing configuration items
         if missing_configs:
-            logger.error("Missing configuration variables:")
+            logger.error("Missing environment variables:")
             for config in missing_configs:
                 logger.error(f"- {config}")
             return False
